@@ -84,7 +84,7 @@ def process_subject(sub_func_path):
 
 def main():
     # 并行计算72个受试者   
-    with concurrent.futures.ThreadPoolExecutor() as executor:
+    with concurrent.futures.ThreadPoolExecutor(max_workers=6) as executor:
         # executor.map(process_subject, SUBJECTS_FUNC_PATH)    
         future_to_path = {executor.submit(process_subject, path): path for path in SUBJECTS_FUNC_PATH}
         for future in concurrent.futures.as_completed(future_to_path):
