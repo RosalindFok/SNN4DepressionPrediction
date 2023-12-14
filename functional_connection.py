@@ -49,7 +49,7 @@ nibabel.load返回一个Nifti1Image类型变量
 
 def process_subject(sub_func_path):
     """
-    计算每个受试者的连接矩阵
+    计算该受试者的连接矩阵
     """
     start_time = time.time()
     files = select_path_list(sub_func_path[0], '.nii')
@@ -83,16 +83,11 @@ def process_subject(sub_func_path):
     print(f'It took {round((end_time - start_time)/60, 2)} minutes to process {sub_name}.')
 
 def main():
-    # 并行计算72个受试者   
-    with concurrent.futures.ThreadPoolExecutor(max_workers=6) as executor:
-        # executor.map(process_subject, SUBJECTS_FUNC_PATH)    
-        future_to_path = {executor.submit(process_subject, path): path for path in SUBJECTS_FUNC_PATH}
-        for future in concurrent.futures.as_completed(future_to_path):
-            path = future_to_path[future]
-            try:
-                result = future.result()
-            except Exception as exc:
-                print(f'Processing {path} generated an exception: {exc}')
+    # 并行计算72个受试者. 每5个一批并行处理->超出会内存溢出
+    parallel_list = [SUBJECTS_FUNC_PATH[i:i+5] for i in range(0, len(SUBJECTS_FUNC_PATH), 5)]
+    for group_list in parallel_list:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
+            executor.map(process_subject, group_list)    
 
 if __name__ == "__main__":
     main()
