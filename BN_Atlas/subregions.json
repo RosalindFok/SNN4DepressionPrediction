@@ -1,0 +1,40 @@
+{
+    "Frontal Lobe " : {
+            "SFG"   : "Superior Frontal Gyrus,1,14",  
+            "MFG"   : "Middle Frontal Gyrus,15,28", 
+            "IFG"   : "Inferior Frontal Gyrus,29,40",
+            "OrG"   : "Orbital Gyrus,41,52",
+            "PrG"   : "Precentral Gyrus,53,64",
+            "PCL"   : "Paracentral Lobule,65,68"
+    },
+    "Temporal Lobe" : {
+            "STG"   : "Superior Temporal Gyrus,69,80",
+            "MTG"   : "Middle Temporal Gyrus,81,88",
+            "ITG"   : "Inferior Temporal Gyrus,89,102",
+            "FuG"   : "Fusiform Gyrus,103,108",
+            "PhG"   : "Parahippocampal Gyrus,109,120",
+            "pSTS"  : "posterior Superior Temporal Sulcus,121,124"
+    },
+    "Parietal Lobe" : {
+            "SPL"   : "Superior Parietal Lobule,125,134",
+            "IPL"   : "Inferior Parietal Lobule,135,146",
+            "Pcun"  : "Precuneus,147,154",
+            "PoG"   : "Postcentral Gyrus,155,162"
+    },
+    "Insular Lobe" : {
+            "INS"   : "Insular Gyrus,163,174"
+    },
+    "Limbic Lobe" : {
+            "CG"    : "Cingulate Gyrus,175,188"
+    },
+    "Occipital Lobe" : {
+            "MVOcC" : "MedioVentral Occipital Cortex,189,198",
+            "LOcC"  : "lateral Occipital Cortex,199,210"
+    },
+    "Subcortical Nuclei" : {
+            "Amyg"  : "Amygdala,211,214",
+            "Hipp"  : "Hippocampus,215,218",
+            "BG"    : "Basal Ganglia,219,230",
+            "Tha"   : "Thalamus,231,246"
+    }
+}
