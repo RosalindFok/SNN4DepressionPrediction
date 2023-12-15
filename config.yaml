@@ -1,5 +1,5 @@
-batch_size: null # null means batch_size = all samples' size
-learning_rate: 0.0001 
+batch_size: null  # null means batch_size = all samples' size
+learning_rate: 0.00001 
 epochs: 100
 save_weights_pth: False
 save_result_txt: False

@@ -83,10 +83,11 @@ def process_subject(sub_func_path):
     print(f'It took {round((end_time - start_time)/60, 2)} minutes to process {sub_name}.')
 
 def main():
-    # 并行计算72个受试者. 每5个一批并行处理->超出会内存溢出
-    parallel_list = [SUBJECTS_FUNC_PATH[i:i+5] for i in range(0, len(SUBJECTS_FUNC_PATH), 5)]
+    # 并行计算72个受试者. 本实验机器上每5个一批并行处理->超出会内存溢出
+    max_workers = 5
+    parallel_list = [SUBJECTS_FUNC_PATH[i:i+max_workers] for i in range(0, len(SUBJECTS_FUNC_PATH), max_workers)]
     for group_list in parallel_list:
-        with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
             executor.map(process_subject, group_list)    
 
 if __name__ == "__main__":
