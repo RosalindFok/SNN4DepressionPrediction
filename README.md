@@ -9,7 +9,7 @@
 
 ## 数据与环境配置
 ### 数据集
-可以调节您自己的路径: `load_path.py`
+可以调节您自己的路径: `load_path.py`<br>
 所用数据集为: [depression_ds002748](https://openneuro.org/datasets/ds002748/versions/1.0.5)
 ```shell
 .
