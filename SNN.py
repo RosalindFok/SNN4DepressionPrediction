@@ -35,8 +35,6 @@ with open(YAML_PATH, 'r') as file:
 batch_size = yaml_data['batch_size']
 learning_rate = yaml_data['learning_rate']
 epochs = yaml_data['epochs']
-save_weights_pth = yaml_data['save_weights_pth']
-save_result_txt = yaml_data['save_result_txt']
 
 # 算力设备 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
