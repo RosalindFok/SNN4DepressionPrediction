@@ -44,7 +44,7 @@ pip install tqdm
 
 ## 程序运行
 基于脑网络组图谱生成每名受试者的功能连接矩阵(并行计算 可根据实验机器情况调整): `python functional_connection.py`<br>
-更改超参数、是否保存模型权重、是否保存结果文件: `config.yaml`<br>
+更改超参数: `config.yaml`<br>
 更改聚合类型并运行脉冲神经网络: `python run.py`<br>
 
 ## 运行结果
