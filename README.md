@@ -47,7 +47,10 @@ pip install tqdm
 更改超参数、是否保存模型权重、是否保存结果文件: `config.yaml`<br>
 更改聚合类型并运行脉冲神经网络: `python run.py`<br>
 
-## 结果对比
-
-
-
+## 运行结果
+|Aggregation Type|AUC|LogLoss|
+|:-:|:-:|:-:|
+|Lobe|0.8809523809523809|0.5515018714141696|
+|Gyrus|0.8711484593837535|0.5555866610637409|
+以脑叶为聚合层面, 训练过程中的损失函数变化值如下图所示:
+![Lobe Train Loss](./Figs/LobeTrainLoss.svg)

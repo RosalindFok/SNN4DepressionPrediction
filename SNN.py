@@ -2,8 +2,9 @@
 """
 脉冲神经网络(Spiking Neural Network)
 """
-import torch, time, argparse, yaml
+import torch, argparse, yaml
 import numpy as np
+import matplotlib.pyplot as plt
 from load_path  import *
 from dataloader import get_train_value_dataloader
 from torch import nn
@@ -12,7 +13,7 @@ from braincog.base.node.node import *
 from braincog.base.connection.layer import *
 from braincog.base.encoder.encoder import *
 from braincog.model_zoo.base_module import BaseModule, BaseLinearModule
-from braincog.utils import rand_ortho, mse
+from braincog.utils import rand_ortho
 from torch import autograd
 from tqdm import tqdm
 np.random.seed(0)
@@ -21,13 +22,11 @@ torch.cuda.manual_seed(2122)
 
 # 参数解析
 parser = argparse.ArgumentParser(description='parameter')
-parser.add_argument('--counterfactual_sector', type=int)
 parser.add_argument('--aggregation_type', type=str)
-parser.add_argument('-step', type=int, default=10)
-parser.add_argument('-lr_target', type=float, default=0.001)
-parser.add_argument('-encode_type', type=str, default='direct')
+parser.add_argument('-step', type=int, default=1)
+parser.add_argument('-lr_target', type=float, default=0.01)
+parser.add_argument('-encode_type', type=str, default='direct') # 编码方式, 可选 ``direct``, ``ttfs``, ``rate``, ``phase``
 args = parser.parse_args()
-counterfactual_sector = args.counterfactual_sector
 aggregation_type = args.aggregation_type
 
 # 超参数 
@@ -84,16 +83,16 @@ class BaseGLSNN(BaseModule):
 
         for m in self.modules():
             if isinstance(m, nn.Linear):
-                #out_, in_ = m.weight.shape
-                #m.weight.data = torch.Tensor(rand_ortho((out_, in_), np.sqrt(6. / (out_ + in_))))
-                #m.bias.data.zero_()
-                m.weight.data.zero_()
+                # out_, in_ = m.weight.shape
+                # m.weight.data = torch.Tensor(rand_ortho((out_, in_), np.sqrt(6. / (out_ + in_))))
+                nn.init.xavier_uniform_(m.weight)
+                # m.weight.data.zero_()
                 m.bias.data.zero_()
 
         self.step = opt.step
         self.lr_target = opt.lr_target
         self.input_size = input_size
-        self.loss = torch.nn.BCELoss() # torch.nn.CrossEntropyLoss() # mse
+        self.loss = nn.MSELoss() 
 
     def forward(self, x):
         """
@@ -167,17 +166,17 @@ class BaseGLSNN(BaseModule):
         return res
 
 length_node_embedding = 245
-num_agg = 7 if aggregation_type == aggregation_lobe else 24
-input_size = length_node_embedding if counterfactual_sector >= 0 else num_agg * length_node_embedding
-snn = BaseGLSNN(input_size=input_size, hidden_sizes=[800] * 3, output_size=1, opt=args)  # 原始的MNIST的
+num_agg = 7 if aggregation_type == aggregation_lobe else 24 if aggregation_type == aggregation_gyrus else 246
+input_size = num_agg * length_node_embedding
+snn = BaseGLSNN(input_size=input_size, hidden_sizes=[1800] * 3, output_size=1, opt=args)  
 snn.to(device)
 optimizer = torch.optim.Adam(snn.forward_parameters(), lr=learning_rate)
 
 # Dataloader
-sector_name, train_loader, test_loader = get_train_value_dataloader(aggregation_type, counterfactual_sector, batch_size)
+sector_name, train_loader, test_loader = get_train_value_dataloader(aggregation_type, batch_size)
 
 # 训练
-def train(ep : int) -> list:
+def train() -> list:
     snn.train()
     for user, xt, yt in train_loader:  # 372
         optimizer.zero_grad()  # 清除梯度
@@ -203,21 +202,30 @@ def test():
     y_true, y_pred = np.array(true_list), np.array(pred_list)
     logLoss = log_loss(y_true, y_pred)
 
-    for x,y in zip(y_pred, y_true):
-        print(x,y)
-    print(f'AUC = {roc_auc}, logLoss = {logLoss}')
+    print(f'Aggregate as {sector_name}, AUC = {roc_auc}, logLoss = {logLoss}')
+
+# 绘图
+def draw_train_loss(all_train_loss : list, sector_name : str, figsize = None):
+    plt.figure(figsize=figsize)
+    x = np.array(range(len(all_train_loss)))
+    plt.plot(all_train_loss, label='Loss', marker='o')
+    plt.title(f'{sector_name} Train Loss', fontname='Times New Roman', fontsize=20)
+    plt.xticks(x,['']*len(x))
+    plt.xlabel(f'Epochs', fontname='Times New Roman', fontsize=16)
+    plt.ylabel(f'Loss', fontname='Times New Roman', fontsize=16)
+    plt.grid()
+    plt.legend()
+    plt.show()
 
 def main():
-    start_time = time.time()
     all_train_loss = []
     for ep in tqdm(range(epochs)):
-        train_loss = train(ep)
+        train_loss = train()
         all_train_loss.append(train_loss.cpu().tolist())
     
-    print(all_train_loss)    
-    
     test()
-    exit(1)
+
+    draw_train_loss(all_train_loss, sector_name)
 
 
 if __name__ == '__main__':

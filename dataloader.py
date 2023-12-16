@@ -175,7 +175,7 @@ class GetData(Dataset):
         assert len(self.participant) == len(self.embeddings) == len(self.targets)
         return len(self.embeddings)
 
-def get_train_value_dataloader(aggregation_type : str, counterfactual_sector : int, batch_size : int) -> None:
+def get_train_value_dataloader(aggregation_type : str, batch_size : int) -> None:
     """ 
     划分训练集 验证集 测试集 
     """
@@ -198,28 +198,16 @@ def get_train_value_dataloader(aggregation_type : str, counterfactual_sector : i
 
         # 脑叶
         if aggregation_type == aggregation_lobe:
-            if counterfactual_sector >= 0:
-                sector_name = lobe_full_name[counterfactual_sector]
-                embeddings.append(MinMaxScaler().fit_transform(all_data_pair[name][0])[counterfactual_sector].tolist())
-            else:
-                sector_name = 'All'
-                embeddings.append(MinMaxScaler().fit_transform(all_data_pair[name][0]).flatten().tolist())
+            sector_name = 'Lobe'
+            embeddings.append(MinMaxScaler().fit_transform(all_data_pair[name][0]).flatten().tolist())
         # 脑回
         elif aggregation_type == aggregation_gyrus:
-            if counterfactual_sector >= 0:
-                sector_name = gyrus_full_name[counterfactual_sector]
-                embeddings.append(MinMaxScaler().fit_transform(all_data_pair[name][0])[counterfactual_sector].tolist())
-            else:
-                sector_name = 'All'
-                embeddings.append(MinMaxScaler().fit_transform(all_data_pair[name][0]).flatten().tolist())
+            sector_name = 'Gyrus'
+            embeddings.append(MinMaxScaler().fit_transform(all_data_pair[name][0]).flatten().tolist())
         # 亚区
         elif aggregation_type == aggregation_not:
-            if counterfactual_sector >= 0:
-                sector_name = str(counterfactual_sector)
-                embeddings.append(MinMaxScaler().fit_transform(all_data_pair[name][0])[counterfactual_sector].tolist())
-            else:
-                sector_name = 'All'
-                embeddings.append(MinMaxScaler().fit_transform(all_data_pair[name][0]).flatten().tolist())
+            sector_name = 'NoA'
+            embeddings.append(MinMaxScaler().fit_transform(all_data_pair[name][0]).flatten().tolist())
         else:
             print(f'Please check you aggregation type = {aggregation_type}')
             exit(1)
@@ -232,18 +220,10 @@ def get_train_value_dataloader(aggregation_type : str, counterfactual_sector : i
 
     # 全样本 465 = 255 + 210. 255 = [0~50]+[72~275]; 210 = [51~71]+[276~464]
     # 训练集:测试集 = 372:93. 372=204+168; 93=51+42
-    # train_loader = make_dataloader(participants[72:-21],
-    #                                embeddings[  72:-21],
-    #                                labels[      72:-21])
-    # test_loader  = make_dataloader(participants[:72]+participants[-21:],
-    #                                embeddings[  :72]+embeddings[  -21:],
-    #                                labels[      :72]+labels[      -21:])
-    # train_loader = make_dataloader(participants[72:],
-    #                                embeddings[  72:],
-    #                                labels[      72:])
-    # test_loader  = make_dataloader(participants[:72],
-    #                                embeddings[  :72],
-    #                                labels[      :72])
-    train_loader = make_dataloader(participants, embeddings, labels)
-    test_loader  = make_dataloader(participants, embeddings, labels)
+    train_loader = make_dataloader(participants[72:-21],
+                                   embeddings[  72:-21],
+                                   labels[      72:-21])
+    test_loader  = make_dataloader(participants[:72]+participants[-21:],
+                                   embeddings[  :72]+embeddings[  -21:],
+                                   labels[      :72]+labels[      -21:])
     return sector_name, train_loader, test_loader
